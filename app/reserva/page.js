@@ -15,13 +15,63 @@ function ReservaForm() {
   async function handleSubmit(e) {
     e.preventDefault();
     setErro("");
-    if (form.senha !== form.confirmarSenha) { setErro("As senhas não coincidem."); return; }
+    
+    if (form.senha !== form.confirmarSenha) { 
+      setErro("As senhas não coincidem."); 
+      return; 
+    }
+    
     setLoading(true);
-    const res = await fetch("/api/hospedes", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ nome: form.nome, cpf: form.cpf, quarto: Number(form.quarto), telefone: form.telefone, senha: form.senha }) });
-    const data = await res.json();
-    setLoading(false);
-    if (!res.ok) { setErro(data.error || "Erro ao realizar reserva."); return; }
-    setSucesso(data);
+    
+    try {
+      console.log("📤 Enviando dados para /api/hospedes...", { nome: form.nome, cpf: form.cpf, quarto: form.quarto, telefone: form.telefone });
+      
+      const res = await fetch("/api/hospedes", { 
+        method: "POST", 
+        headers: { "Content-Type": "application/json" }, 
+        body: JSON.stringify({ 
+          nome: form.nome, 
+          cpf: form.cpf, 
+          quarto: Number(form.quarto), 
+          telefone: form.telefone,
+          senha: form.senha
+        })
+      });
+      
+      console.log("📥 Resposta recebida. Status:", res.status);
+      console.log("📥 Content-Type:", res.headers.get("content-type"));
+      
+      // Verificar se a resposta é JSON válida
+      const text = await res.text();
+      console.log("📥 Resposta bruta:", text);
+      
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch (e) {
+        console.error("❌ Erro ao fazer parse da resposta JSON:", e);
+        console.error("❌ Texto recebido:", text);
+        setErro("Erro de servidor: resposta inválida (" + text.substring(0, 100) + ")");
+        setLoading(false);
+        return;
+      }
+      
+      setLoading(false);
+      
+      if (!res.ok) { 
+        console.error("❌ Erro na API:", data.error || data.details);
+        setErro(data.error || data.details || "Erro ao realizar reserva."); 
+        return; 
+      }
+      
+      console.log("✅ Sucesso! Dados:", data);
+      setSucesso(data);
+      
+    } catch (error) {
+      console.error("❌ Erro na requisição:", error);
+      setErro("Erro de conexão: " + error.message);
+      setLoading(false);
+    }
   }
 
   if (sucesso) {
@@ -59,30 +109,30 @@ function ReservaForm() {
             <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="md:col-span-2">
                 <label className="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wide">Nome completo *</label>
-                <input type="text" placeholder="Seu nome completo" value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 outline-none focus:border-[#0071c2] transition" required />
+                <input type="text" placeholder="Seu nome completo" value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 outline-none focus:border-[#0071c2]" required />
               </div>
               <div>
                 <label className="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wide">CPF *</label>
-                <input type="text" placeholder="000.000.000-00" value={form.cpf} onChange={(e) => setForm({ ...form, cpf: e.target.value })} className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 outline-none focus:border-[#0071c2] transition" required />
+                <input type="text" placeholder="000.000.000-00" value={form.cpf} onChange={(e) => setForm({ ...form, cpf: e.target.value })} className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 outline-none focus:border-[#0071c2]" required />
               </div>
               <div>
                 <label className="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wide">Telefone *</label>
-                <input type="tel" placeholder="(00) 00000-0000" value={form.telefone} onChange={(e) => setForm({ ...form, telefone: e.target.value })} className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 outline-none focus:border-[#0071c2] transition" required />
+                <input type="tel" placeholder="(00) 00000-0000" value={form.telefone} onChange={(e) => setForm({ ...form, telefone: e.target.value })} className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 outline-none focus:border-[#0071c2]" required />
               </div>
               <div className="md:col-span-2">
                 <label className="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wide">Número do quarto *</label>
-                <select value={form.quarto} onChange={(e) => setForm({ ...form, quarto: e.target.value })} className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 outline-none focus:border-[#0071c2] transition bg-white" required>
+                <select value={form.quarto} onChange={(e) => setForm({ ...form, quarto: e.target.value })} className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 outline-none focus:border-[#0071c2]" required>
                   <option value="">Selecione um quarto</option>
                   {quartos.map((q) => (<option key={q.id} value={q.id}>Quarto {q.id} — {q.nome} (R$ {q.preco}/noite)</option>))}
                 </select>
               </div>
               <div>
                 <label className="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wide">Criar senha *</label>
-                <input type="password" placeholder="Mínimo 6 caracteres" value={form.senha} onChange={(e) => setForm({ ...form, senha: e.target.value })} className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 outline-none focus:border-[#0071c2] transition" minLength={6} required />
+                <input type="password" placeholder="Mínimo 6 caracteres" value={form.senha} onChange={(e) => setForm({ ...form, senha: e.target.value })} className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 outline-none focus:border-[#0071c2]" required />
               </div>
               <div>
                 <label className="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wide">Confirmar senha *</label>
-                <input type="password" placeholder="Repita a senha" value={form.confirmarSenha} onChange={(e) => setForm({ ...form, confirmarSenha: e.target.value })} className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 outline-none focus:border-[#0071c2] transition" required />
+                <input type="password" placeholder="Repita a senha" value={form.confirmarSenha} onChange={(e) => setForm({ ...form, confirmarSenha: e.target.value })} className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 outline-none focus:border-[#0071c2]" required />
               </div>
               <div className="md:col-span-2 mt-2">
                 <button type="submit" disabled={loading} className="w-full bg-[#febb02] text-[#003580] font-bold py-3.5 rounded-xl text-base hover:bg-[#f0b400] transition disabled:opacity-50">
