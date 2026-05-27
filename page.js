@@ -5,9 +5,9 @@ import Link from "next/link";
 import { quartos } from "@/lib/rooms";
 
 const depoimentos = [
-  { nome: "Ana Lima",       cidade: "São Paulo, SP", texto: "Simplesmente perfeito! O quarto era lindo e o café da manhã incrível.", nota: 10, avatar: "AL" },
-  { nome: "Carlos Mendes",  cidade: "Fortaleza, CE", texto: "Melhor hotel do Nordeste. Preços justos e conforto de luxo. Voltarei!", nota: 9,  avatar: "CM" },
-  { nome: "Fernanda Costa", cidade: "Recife, PE",    texto: "A suíte master superou todas as expectativas. A jacuzzi é incrível!",  nota: 10, avatar: "FC" },
+  { nome: "Ana Lima",      cidade: "São Paulo, SP",  texto: "Simplesmente perfeito! O quarto era lindo e o café da manhã incrível.", nota: 10, avatar: "AL" },
+  { nome: "Carlos Mendes", cidade: "Fortaleza, CE",  texto: "Melhor hotel do Nordeste. Preços justos e conforto de luxo. Voltarei!", nota: 9,  avatar: "CM" },
+  { nome: "Fernanda Costa",cidade: "Recife, PE",     texto: "A suíte master superou todas as expectativas. A jacuzzi é incrível!",  nota: 10, avatar: "FC" },
 ];
 
 export default function Home() {
@@ -16,6 +16,7 @@ export default function Home() {
       <Hero />
       <Features />
 
+      {/* Quartos em destaque */}
       <section className="py-14 max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between mb-8">
           <div>
@@ -33,6 +34,7 @@ export default function Home() {
         </div>
       </section>
 
+      {/* CTA */}
       <section className="py-16 text-white text-center" style={{ background: "linear-gradient(135deg,#003580,#0071c2)" }}>
         <h2 className="text-3xl font-extrabold mb-3">Pronto para reservar?</h2>
         <p className="text-blue-200 mb-8 text-lg">Garanta sua estadia com os melhores preços.</p>
@@ -43,6 +45,7 @@ export default function Home() {
         </Link>
       </section>
 
+      {/* Depoimentos */}
       <section className="py-14 max-w-7xl mx-auto px-4">
         <h2 className="text-2xl font-bold text-[#003580] mb-2 text-center">O que dizem nossos hóspedes</h2>
         <p className="text-gray-500 text-center mb-10 text-sm">Avaliações reais de quem já ficou conosco</p>
@@ -55,7 +58,9 @@ export default function Home() {
               </div>
               <p className="text-gray-600 text-sm leading-relaxed mb-5 italic">{d.texto}</p>
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-[#003580] text-white flex items-center justify-center font-bold text-sm">{d.avatar}</div>
+                <div className="w-10 h-10 rounded-full bg-[#003580] text-white flex items-center justify-center font-bold text-sm">
+                  {d.avatar}
+                </div>
                 <div>
                   <p className="font-semibold text-sm text-gray-800">{d.nome}</p>
                   <p className="text-xs text-gray-400">{d.cidade}</p>
