@@ -10,6 +10,10 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: hospedes
+    description: Hospedes (guests) operations
+  - name: auth
+    description: Authentication operations
 paths:
   /healthz:
     get:
@@ -24,6 +28,102 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Login with CPF and senha
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginInput"
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResult"
+        "400":
+          description: Bad request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not found
+  /hospedes:
+    get:
+      operationId: listHospedes
+      tags: [hospedes]
+      summary: List all hospedes
+      responses:
+        "200":
+          description: List of hospedes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Hospede"
+    post:
+      operationId: createHospede
+      tags: [hospedes]
+      summary: Create a new hospede (reservation)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HospedeInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Hospede"
+        "400":
+          description: Bad request
+  /hospedes/{id}:
+    get:
+      operationId: getHospede
+      tags: [hospedes]
+      summary: Get a hospede by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Hospede found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Hospede"
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteHospede
+      tags: [hospedes]
+      summary: Delete a hospede
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteResult"
+        "404":
+          description: Not found
 components:
   schemas:
     HealthStatus:
@@ -33,4 +133,64 @@ components:
           type: string
       required:
         - status
-
+    LoginInput:
+      type: object
+      required: [cpf, senha]
+      properties:
+        cpf:
+          type: string
+        senha:
+          type: string
+    LoginResult:
+      type: object
+      required: [token, id, nome, cpf, quarto]
+      properties:
+        token:
+          type: string
+        id:
+          type: integer
+        nome:
+          type: string
+        cpf:
+          type: string
+        quarto:
+          type: integer
+    Hospede:
+      type: object
+      required: [id, nome, cpf, quarto, telefone]
+      properties:
+        id:
+          type: integer
+        nome:
+          type: string
+        cpf:
+          type: string
+        quarto:
+          type: integer
+        telefone:
+          type: string
+    HospedeInput:
+      type: object
+      required: [nome, cpf, quarto, telefone, senha]
+      properties:
+        nome:
+          type: string
+        cpf:
+          type: string
+        quarto:
+          type: integer
+        telefone:
+          type: string
+        senha:
+          type: string
+    DeleteResult:
+      type: object
+      required: [ok]
+      properties:
+        ok:
+          type: boolean
+        deleted:
+          type: object
+          properties:
+            id:
+              type: integer
