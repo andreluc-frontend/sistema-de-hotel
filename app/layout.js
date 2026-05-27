@@ -3,8 +3,8 @@ import Footer from "@/components/Footer";
 import "./globals.css";
 
 export const metadata = {
-  title: "Hotel.com — Sua estadia perfeita",
-  description: "Reserve quartos com conforto e qualidade.",
+  title: "Hotel de João — Sistema de Reservas",
+  description: "Reserve quartos com conforto e qualidade. Dashboard completo com autenticação.",
 };
 
 export default function RootLayout({ children }) {
